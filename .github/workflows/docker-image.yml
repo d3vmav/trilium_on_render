@@ -8,10 +8,10 @@ on:
     types: [created]
 
 env:
-  DOCKER_IMAGE_NAME: triliumOnRender
+  DOCKER_IMAGE_NAME: trilium_on_render
   DOCKER_REGISTRY: ghcr.io
   DOCKER_IMAGE_TAG: latest
-  GITHUB_REPOSITORY: d3vmav/triliumOnRender
+  GITHUB_REPOSITORY: d3vmav/trilium_on_render
 
 jobs:
   build-and-push:
