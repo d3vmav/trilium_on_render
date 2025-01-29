@@ -18,7 +18,7 @@ RUN mkdir -p /root/trilium-data && \
     rm trilium.tar.xz  # Clean up
 
 # Download startup script
-RUN curl -fsSL https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5780b0b00/raw/trilium.sh -o trilium.sh && \
+RUN curl -fsSL https://gist.githubusercontent.com/d3vmav/42fa9c62f26cb493099a8200badda463/raw/gistfile1.txt -o trilium.sh && \
     chmod +x trilium.sh
 
 EXPOSE 8080
