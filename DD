@@ -1,15 +1,33 @@
-FROM ubuntu:latest
+# Use a lightweight base image
+FROM debian:bookworm-slim
 
 WORKDIR /usr/src/app
 
-RUN set -ex \
-    && chmod 777 /usr/src/app 
+# Install only required packages & remove cache
+RUN apt update -y && apt install -y --no-install-recommends \
+    curl jq xz-utils file unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt update -y && apt install curl jq xz-utils file -y
+# Ensure working directory is writable
+RUN chmod 777 /usr/src/app
 
-RUN mkdir /root/trilium-data && curl -L "$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/TriliumNext/Notes/releases | jq -r '[.[] | select(.prerelease)] | first | .assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url')" | tar -Jxv --strip-components=1
-#RUN wget https://lmao.vtz.workers.dev/0:/tdata.zip && unzip ./tdata.zip -d /root/trilium-data 
-#&& wget https://1.bob69.workers.dev/1:/trilium.zip && unzip ./trilium.zip
-RUN curl https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5780b0b00/raw/trilium.sh -O
+# Set up Trilium data directory
+RUN mkdir -p /root/trilium-data
+
+# Fetch latest beta release URL first, then download & extract in separate steps
+RUN export TRILIUM_URL=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+    https://api.github.com/repos/TriliumNext/Notes/releases | \
+    jq -r '[.[] | select(.prerelease)] | first | .assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url') \
+    && curl -L "$TRILIUM_URL" -o trilium.tar.xz \
+    && tar -Jxvf trilium.tar.xz --strip-components=1 \
+    && rm -f trilium.tar.xz  # Cleanup
+
+# Fetch & set up Trilium startup script
+RUN curl -sSL "https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5780b0b00/raw/trilium.sh" -o trilium.sh \
+    && chmod +x trilium.sh
+
+# Expose application port
 EXPOSE 8080
-CMD [ "./trilium.sh" ]
+
+# Run application
+CMD ["./trilium.sh"]
