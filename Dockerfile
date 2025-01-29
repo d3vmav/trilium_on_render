@@ -1,1 +1,1 @@
-FROM ghcr.io/d3vmav/triliumOnRender:latest
+FROM ghcr.io/d3vmav/trilium_on_render:latest
