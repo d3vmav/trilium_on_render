@@ -22,4 +22,4 @@ RUN curl -fsSL https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5
 EXPOSE 8080
 
 # Set execution command
-CMD ["./trilium.sh"]
+CMD [ "sh", "./trilium.sh" ]
