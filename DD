@@ -1,15 +1,15 @@
-FROM alpine:latest
+FROM ubuntu:minimal
 
-# Set working directory
 WORKDIR /usr/src/app
 
 # Install only necessary dependencies
-RUN apk add --no-cache \
-    curl jq xz && \
-    mkdir -p /root/trilium-data
+RUN apt update -y && apt install -y --no-install-recommends \
+    curl jq xz-utils file && \
+    rm -rf /var/lib/apt/lists/*
 
 # Fetch latest pre-release of Trilium Notes and extract it
-RUN curl -fsSL "$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
+RUN mkdir -p /root/trilium-data && \
+    curl -fsSL "$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/repos/TriliumNext/Notes/releases | \
     jq -r '[.[] | select(.prerelease)] | first | .assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url')" | \
     tar -Jx --strip-components=1 -C /usr/src/app
@@ -18,8 +18,6 @@ RUN curl -fsSL "$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
 RUN curl -fsSL https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5780b0b00/raw/trilium.sh -o trilium.sh && \
     chmod +x trilium.sh
 
-# Expose port
 EXPOSE 8080
 
-# Set execution command
-CMD [ "sh", "./trilium.sh" ]
+CMD ["./trilium.sh"]
