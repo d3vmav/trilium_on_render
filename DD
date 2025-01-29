@@ -7,8 +7,7 @@ RUN set -ex \
 
 RUN apt update -y && apt install curl jq xz-utils file -y
 
-RUN mkdir /root/trilium-data && curl -L "$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/TriliumNext/Notes/releases/latest | jq -r '.assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url')" | tar -Jxv --strip-components=1
-
+RUN mkdir /root/trilium-data && curl -L "$(curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/TriliumNext/Notes/releases | jq -r '[.[] | select(.prerelease)] | first | .assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url')" | tar -Jxv --strip-components=1
 #RUN wget https://lmao.vtz.workers.dev/0:/tdata.zip && unzip ./tdata.zip -d /root/trilium-data 
 #&& wget https://1.bob69.workers.dev/1:/trilium.zip && unzip ./trilium.zip
 RUN curl https://gist.githubusercontent.com/mem69/023434b1eb72125de193c6b5780b0b00/raw/trilium.sh -O
