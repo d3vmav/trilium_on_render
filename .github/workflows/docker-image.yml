@@ -41,7 +41,13 @@ jobs:
     - name: Render Redeploy
       if: success()
       run: |
-        curl --request GET \
-          --url https://api.render.com/deploy/srv-cud3gkin91rc73eo6sfg?key=${{ secrets.RENDER_TOKEN }} \
+        curl --request POST \
+          --url ${{ secrets.RENDER_DEPLOY_HOOK_URL }} \
           --header 'accept: application/json' \
-          --header 'content-type: application/json'
+          --header 'content-type: application/json' \
+          --data '
+        {
+          "clearCache": "clear"
+        }
+        '
+
