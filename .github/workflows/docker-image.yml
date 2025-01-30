@@ -38,17 +38,10 @@ jobs:
       run: docker push ${{ env.DOCKER_REGISTRY }}/${{ env.GITHUB_REPOSITORY }}:${{ env.DOCKER_IMAGE_TAG }}
 
     # Render redeploy
- #   - name: Render Redeploy
- #     if: success()
- #     run: |
- #       curl --request POST \
- #         --url https://api.render.com/v1/services/srv-ce2pc59a6gdpj3539to0/deploys \
- #         --header 'accept: application/json' \
- #         --header 'authorization: Bearer ${{ secrets.RENDER_TOKEN }}' \
- #         --header 'content-type: application/json' \
- #         --data '
- #       {
- #         "clearCache": "clear"
- #       }
- #       '
-
+    - name: Render Redeploy
+      if: success()
+      run: |
+        curl --request GET \
+          --url https://api.render.com/deploy/srv-cud3gkin91rc73eo6sfg?key=${{ secrets.RENDER_TOKEN }} \
+          --header 'accept: application/json' \
+          --header 'content-type: application/json'
