@@ -11,12 +11,11 @@ RUN apt update -y && apt install -y --no-install-recommends \
 # Fetch the latest Trilium Notes tarball
 RUN mkdir -p /root/trilium-data && \
     TRILIUM_URL=$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
-    https://api.github.com/repos/TriliumNext/Notes/releases/latest | \
-    jq -r '.assets[] | select(.name | endswith("-server-linux-x64.tar.xz")) | .browser_download_url') && \
-    curl -fsSL "$TRILIUM_URL" -o /root/trilium.tar.xz && \
-    tar -Jxvf /root/trilium.tar.xz --strip-components=1 -C /usr/src/app && \
-    rm /root/trilium.tar.xz # Clean up
-
+    https://api.github.com/repos/TriliumNext/Notes/releases | \
+    jq -r '[.[] | select(.prerelease == false and .draft == false)] | first | .assets[] | select(.name | startswith("TriliumNextNotes-linux-x64")) | .browser_download_url') && \
+    curl -fsSL "$TRILIUM_URL" -o trilium.tar.xz && \
+    tar -Jxvf trilium.tar.xz --strip-components=1 -C /usr/src/app && \
+    rm trilium.tar.xz  # Clean up
 # Download startup script
 RUN curl -fsSL https://gist.githubusercontent.com/d3vmav/42fa9c62f26cb493099a8200badda463/raw/gistfile1.txt -o trilium.sh && \
     chmod +x trilium.sh
