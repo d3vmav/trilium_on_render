@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app 
 
 RUN set -ex \
     && chmod 777 /usr/src/app 
