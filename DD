@@ -12,7 +12,7 @@ RUN apt update -y && apt install -y --no-install-recommends \
 RUN mkdir -p /root/trilium-data && \
     TRILIUM_URL=$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/repos/TriliumNext/Trilium/releases | \
-    jq -r '[.[] | select(.prerelease == false and .draft == false)] | first | .assets[] | select(.name | startswith("TriliumNotes-Server-v0.98.0-linux-x64")) | .browser_download_url') && \
+    jq -r '[.[] | select(.prerelease == false and .draft == false)] | first | .assets[] | select(.name | startswith("TriliumNotes-Server-v0.98.1-linux-x64")) | .browser_download_url') && \
     curl -fsSL "$TRILIUM_URL" -o trilium.tar.xz && \
     tar -Jxvf trilium.tar.xz --strip-components=1 -C /usr/src/app && \
     rm trilium.tar.xz  # Clean up
