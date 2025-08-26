@@ -2,24 +2,32 @@ FROM debian:bookworm-slim
 
 WORKDIR /usr/src/app
 
-# Install dependencies and update CA certificates
-RUN apt update -y && apt install -y --no-install-recommends \
+# deps + CA certs
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
     curl jq xz-utils file ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
-# Fetch the latest Trilium Notes tarball
-RUN mkdir -p /root/trilium-data && \
-    TRILIUM_URL=$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
-    https://api.github.com/repos/TriliumNext/Notes/releases | \
-    jq -r '[.[] | select(.prerelease == false and .draft == false)] | first | .assets[] | select(.name | startswith("TriliumNextNotes-linux-x64")) | .browser_download_url') && \
+# Optional: build-arg to pin a specific release (e.g., --build-arg TRILIUM_TAG=v0.98.0)
+ARG TRILIUM_TAG=
+ENV TRILIUM_DATA=/root/trilium-data
+
+# Fetch latest (or tagged) Server build from the new repo
+RUN mkdir -p "$TRILIUM_DATA" && \
+    if [ -n "$TRILIUM_TAG" ]; then \
+      API_URL="https://api.github.com/repos/TriliumNext/Trilium/releases/tags/${TRILIUM_TAG}"; \
+    else \
+      API_URL="https://api.github.com/repos/TriliumNext/Trilium/releases/latest"; \
+    fi && \
+    TRILIUM_URL=$(curl -fsSL -H "Accept: application/vnd.github.v3+json" "$API_URL" | \
+      jq -r '.assets[] | select(.name | test("TriliumNotes-Server-.*-linux-x64\\.tar\\.xz$")) | .browser_download_url') && \
     curl -fsSL "$TRILIUM_URL" -o trilium.tar.xz && \
     tar -Jxvf trilium.tar.xz --strip-components=1 -C /usr/src/app && \
-    rm trilium.tar.xz  # Clean up
-# Download startup script
+    rm trilium.tar.xz
+
+# Startup script (yours)
 RUN curl -fsSL https://gist.githubusercontent.com/d3vmav/42fa9c62f26cb493099a8200badda463/raw/gistfile1.txt -o trilium.sh && \
     chmod +x trilium.sh
 
 EXPOSE 8080
-
 CMD ["./trilium.sh"]
